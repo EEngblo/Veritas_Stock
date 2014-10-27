@@ -8,17 +8,18 @@ using namespace std;
 #pragma warning(disable:4996)
 #define timemax 10
 #define COMPNUM 15 // 회사 개수
-#define STUDENT 40
+#define STUDENT 1600
 #define t 2 // 한 턴의 길이
 
 char companyname[COMPNUM][30] = { "장보고해운", "NEVER", "샘숭전자", "와플", "Gogle", "박카스제약", "해이트", "장’s 동원", "김’s 정원", "Sadi&Majo Ent", "GG Ent", "목우촌", "보잉", "911항공", "삼풍건설" }; //회사 이름 설정 
 int stock[10][COMPNUM] = {};
-int student[STUDENT][COMPNUM + 5];
+int student[STUDENT][COMPNUM + 5] = {};
 
 FILE*fp = fopen("data.csv", "w+"); //파일출력
 int i, j, n, temp, ran, social_ran, sum, count;
 
 int stockgame();
+int input();
 
 enum account {
 	장보고해운,
@@ -37,6 +38,7 @@ enum account {
 	구일일항공,
 	삼풍건설,
 	이름,
+	플레이여부,
 	현금보유액,
 };
 
@@ -61,9 +63,9 @@ void print_box(){
 	printf("∮VERITAS 모의주식 WITH LIMES∮");
 	srand(time(NULL));
 	gotoxy(3, 6);
-	printf("┌─────────────────────────┬───────────────┬───────────────────────────────┐");
+	printf("┌─────────────────────────┬────────────────────┬───────────────────────────────┐");
 	gotoxy(3, 2 * COMPNUM + 7 - 1);
-	printf("└─────────────────────────┴───────────────┴──────────────┘");
+	printf("└─────────────────────────┴────────────────────┴──────────────┘");
 	gotoxy(59, 15);
 	printf("           ");
 
@@ -83,7 +85,7 @@ void stock_price(){
 	for (i = 0; i<COMPNUM; i++)	{
 		if (stock[bankrupt][i] == 1) stock[bankrupt_turns][i]++;
 		if (stock[bankrupt_turns][i] >= 5) stock[bankrupt][i] = 0, stock[price][i] = 20000;
-		temp = stock[price][i];
+		temp = 0;
 
 		//stock[price][i] 랜덤 변경 함수 시작 
 		ran = rand() % randomconst;
@@ -107,40 +109,45 @@ void stock_price(){
 		if (stock[pos_collapse][i] == 3) ran = 1001, stock[pos_collapse][i] = 0;
 
 		if (ran < 400)
-			stock[price][i] += rand() % 700 + 200, stock[plus_or_minus][i] = 0;
+			temp += rand() % 700 + 200, stock[plus_or_minus][i] = 0;
 		else if (ran < 800)
-			stock[price][i] -= rand() % 700 + 200, stock[plus_or_minus][i] = 1;
+			temp -= rand() % 700 + 200, stock[plus_or_minus][i] = 1;
 		else if (ran < 875)
-			stock[price][i] += rand() % 1500 + 200, stock[plus_or_minus][i] = 0;
+			temp += rand() % 1500 + 300, stock[plus_or_minus][i] = 0;
 		else if (ran < 950)
-			stock[price][i] -= rand() % 1500 + 200, stock[plus_or_minus][i] = 1;
+			temp -= rand() % 1500 + 300, stock[plus_or_minus][i] = 1;
 		else if (ran < 965)
-			stock[price][i] += (rand() % 3000 + 2000), stock[plus_or_minus][i] = 0;
+			temp += (rand() % 3000 + 2000), stock[plus_or_minus][i] = 0;
 		else if (ran < 980)
-			stock[price][i] -= (rand() % 3000 + 2000), stock[plus_or_minus][i] = 1;
+			temp -= (rand() % 3000 + 2000), stock[plus_or_minus][i] = 1;
 		else if (ran < 985)
-			stock[price][i] += (rand() % 5000 + 5000), stock[plus_or_minus][i] = 0;
+			temp += (rand() % 5000 + 5000), stock[plus_or_minus][i] = 0;
 		else if (ran < 990)
-			stock[price][i] -= (rand() % 5000 + 5000), stock[plus_or_minus][i] = 1;
+			temp -= (rand() % 5000 + 5000), stock[plus_or_minus][i] = 1;
 		else if (ran < 993)
-			stock[price][i] += (rand() % 3000 + 2000), stock[plus_or_minus][i] = 0, stock[pos_jump][i] = 1;
+			temp += (rand() % 3000 + 2000), stock[plus_or_minus][i] = 0, stock[pos_jump][i] = 1;
 		else if (ran < 996)
-			stock[price][i] -= (rand() % 3000 + 2000), stock[plus_or_minus][i] = 1, stock[pos_collapse][i] = 1;
+			temp -= (rand() % 3000 + 2000), stock[plus_or_minus][i] = 1, stock[pos_collapse][i] = 1;
 		else if (ran < 998)
-			stock[price][i] += (rand() % 5000 + 7000), stock[plus_or_minus][i] = 0;
+			temp += (rand() % 5000 + 7000), stock[plus_or_minus][i] = 0;
 		else
-			stock[price][i] -= (rand() % 5000 + 7000), stock[plus_or_minus][i] = 1;
+			temp -= (rand() % 5000 + 7000), stock[plus_or_minus][i] = 1;
+
+		
 		//stock[price][i] 랜덤 변경 함수 종료 
 		/******************************************/
 		// 사회적 요인 결정 함수
 
 		/******************************************/
+
+		double tempercent = (double)temp/stock[price][i]*100;
+		stock[price][i] += temp;
 		if (stock[price][i]<0){ // 파산결정
 			stock[bankrupt][i] = 1;
 			stock[price][i] = 0;
 		}
 
-		if ((stock[price][i] - temp) == 0) stock[plus_or_minus][i] = 2;
+		if (temp == 0) stock[plus_or_minus][i] = 2;
 
 		gotoxy(3, 2 * i + 7);
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
@@ -151,15 +158,15 @@ void stock_price(){
 			gotoxy(31, 2 * i + 7);
 			if (stock[plus_or_minus][i] == 0){
 				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);
-				printf("▲ %5d", stock[price][i] - temp);
+				printf("▲ %5d     %2.2lf %%", temp, tempercent);
 			}
 			else if (stock[plus_or_minus][i] == 1){
 				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 3);
-				printf("▼ %5d", temp - stock[price][i]);
+				printf("▼ %5d    %2.2lf %%", temp, tempercent);
 			}
 			else{
 				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14);
-				printf("━ %5d", temp - stock[price][i]);
+				printf("━ %5d", temp);
 			}
 		}
 		else{
@@ -172,7 +179,7 @@ void stock_price(){
 		}
 
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
-		gotoxy(45, 2 * i + 7);
+		gotoxy(50, 2 * i + 7);
 		printf("│");
 		gotoxy(29, 2 * i + 7);
 		printf("│");
@@ -180,7 +187,7 @@ void stock_price(){
 		if (i == COMPNUM - 1) continue;
 		else {
 			gotoxy(3, 2 * i + 8);
-			printf("├─────────────────────────┼───────────────┤                            │");
+			printf("├─────────────────────────┼────────────────────┤                            │");
 		}
 	}
 }
@@ -209,13 +216,13 @@ void news(){
 
 
 	gotoxy(45, 8);
-	printf("┼──────────────────────────┤");
-	gotoxy(47, 7);
+	printf("─────┼──────────────────────────┤");
+	gotoxy(53, 7);
 	printf("         Daily NEWS");
 	news_num = 1;
 	//rand()%type;
 	det = rand() % 3;
-	gotoxy(47, 11);
+	gotoxy(53, 11);
 	switch (news_num)
 	{
 	case 0: //화산 폭발
@@ -275,5 +282,42 @@ void news(){
 void init(){
 	for (i = 0; i<COMPNUM; i++)	stock[price][i] = 20000; // 주식 초기값 설정
 
+
+	int studentnumber=0;
+
+	while (1) {
+
+		cout << "* VERITAS 모의주식 (with LIMES) ver. 2.0.2 *" << endl << endl;
+		cout << "게임에 참여하시려면 학번을 입력해 주세요 : ";
+		cin >> studentnumber;
+		if (studentnumber>1100 &&
+			(studentnumber <= 1121 ||
+			(studentnumber > 1200 && studentnumber <= 1220) ||
+			(studentnumber > 1300 && studentnumber <= 1320) ||
+			(studentnumber > 1400 && studentnumber <= 1420) ||
+			(studentnumber > 1500 && studentnumber <= 1520)) || studentnumber == 2487){
+			if (studentnumber == 2487) {
+				gotoxy(0, 2);
+				cout << "게임이 곧 시작됩니다.                                        " << endl;  break;
+			}
+				student[플레이여부][studentnumber] = 1;
+		}
+
+
+		
+		if (student[플레이여부][studentnumber]) cout << studentnumber << " 게임 참가 신청 완료." << endl << endl;
+		else if(studentnumber != 2487) cout << "잘못된 학번" << endl << endl;
+		fflush(stdin);
+		system("PAUSE");
+		clrscr();
+	}
+
+	for (i = 0; i < STUDENT; i++) 
+		if(student[플레이여부][i]) student[현금보유액][i] = 200000;
+	system("PAUSE");
+	clrscr();
+	
+
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15); //글자 색 변화 
+
 }
