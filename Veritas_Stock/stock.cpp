@@ -12,8 +12,8 @@ int main(int argc, char *argv[]) {
 
 int stockgame(){
 	print_box();
-	news();
 	stock_price();
+	news();
 	print_time();
 	clrscr();
 

@@ -16,7 +16,7 @@ int stock[10][COMPNUM] = {};
 int student[STUDENT][COMPNUM + 5];
 
 FILE*fp = fopen("data.csv", "w+"); //파일출력
-int i, j, n, temp, sum, count;
+int i, j, n, temp, ran, social_ran, sum, count;
 
 int stockgame();
 
@@ -74,58 +74,67 @@ void print_box(){
 
 
 void stock_price(){
+	
+	social_ran = rand() % 100;
+
+	int randomconst = 1000;
+	if (social_ran < 80) randomconst = 950;
+
 	for (i = 0; i<COMPNUM; i++)	{
 		if (stock[bankrupt][i] == 1) stock[bankrupt_turns][i]++;
 		if (stock[bankrupt_turns][i] >= 5) stock[bankrupt][i] = 0, stock[price][i] = 20000;
 		temp = stock[price][i];
 
 		//stock[price][i] 랜덤 변경 함수 시작 
-		stock[randomseed][i] = rand() % 10000;
+		ran = rand() % randomconst;
 
 		if (stock[price][i]>40000){
 			stock[overflow][i]++;
 			if (stock[overflow][i]>5){
-				stock[randomseed][i] = 9850;
+				ran = 985;
 				stock[overflow][i] = 0;
 			}
 		}
 		else
 			stock[overflow][i] = 0;
 
-		if (stock[pos_jump][i] == 1) stock[randomseed][i] = 9300, stock[pos_jump][i]++;
-		if (stock[pos_jump][i] == 2) stock[randomseed][i] = 9700, stock[pos_jump][i]++;
-		if (stock[pos_jump][i] == 3) stock[randomseed][i] = 10000, stock[pos_jump][i] = 0;
+		if (stock[pos_jump][i] == 1) stock[randomseed][i] = 930, stock[pos_jump][i]++;
+		if (stock[pos_jump][i] == 2) stock[randomseed][i] = 970, stock[pos_jump][i]++;
+		if (stock[pos_jump][i] == 3) stock[randomseed][i] = 1000, stock[pos_jump][i] = 0;
 
-		if (stock[pos_collapse][i] == 1) stock[randomseed][i] = 9000, stock[pos_collapse][i]++;
-		if (stock[pos_collapse][i] == 2) stock[randomseed][i] = 9700, stock[pos_collapse][i]++;
-		if (stock[pos_collapse][i] == 3) stock[randomseed][i] = 10001, stock[pos_collapse][i] = 0;
+		if (stock[pos_collapse][i] == 1) ran = 900, stock[pos_collapse][i]++;
+		if (stock[pos_collapse][i] == 2) ran = 970, stock[pos_collapse][i]++;
+		if (stock[pos_collapse][i] == 3) ran = 1001, stock[pos_collapse][i] = 0;
 
-		if (stock[randomseed][i]<4500)
-			stock[price][i] += rand() % 700, stock[plus_or_minus][i] = 0;
-		else if (4500 <= stock[randomseed][i] && stock[randomseed][i]<9000)
-			stock[price][i] -= rand() % 700, stock[plus_or_minus][i] = 1;
-		else if (9000 <= stock[randomseed][i] && stock[randomseed][i]<9300)
-			stock[price][i] += rand() % 1500, stock[plus_or_minus][i] = 0;
-		else if (9300 <= stock[randomseed][i] && stock[randomseed][i]<9600)
-			stock[price][i] -= rand() % 1500, stock[plus_or_minus][i] = 1;
-		else if (9600 <= stock[randomseed][i] && stock[randomseed][i]<9700)
+		if (ran < 400)
+			stock[price][i] += rand() % 700 + 200, stock[plus_or_minus][i] = 0;
+		else if (ran < 800)
+			stock[price][i] -= rand() % 700 + 200, stock[plus_or_minus][i] = 1;
+		else if (ran < 875)
+			stock[price][i] += rand() % 1500 + 200, stock[plus_or_minus][i] = 0;
+		else if (ran < 950)
+			stock[price][i] -= rand() % 1500 + 200, stock[plus_or_minus][i] = 1;
+		else if (ran < 965)
 			stock[price][i] += (rand() % 3000 + 2000), stock[plus_or_minus][i] = 0;
-		else if (9700 <= stock[randomseed][i] && stock[randomseed][i]<9800)
+		else if (ran < 980)
 			stock[price][i] -= (rand() % 3000 + 2000), stock[plus_or_minus][i] = 1;
-		else if (9800 <= stock[randomseed][i] && stock[randomseed][i]<9830)
+		else if (ran < 985)
 			stock[price][i] += (rand() % 5000 + 5000), stock[plus_or_minus][i] = 0;
-		else if (9830 <= stock[randomseed][i] && stock[randomseed][i]<9900)
+		else if (ran < 990)
 			stock[price][i] -= (rand() % 5000 + 5000), stock[plus_or_minus][i] = 1;
-		else if (9900 <= stock[randomseed][i] && stock[randomseed][i]<9930)
+		else if (ran < 993)
 			stock[price][i] += (rand() % 3000 + 2000), stock[plus_or_minus][i] = 0, stock[pos_jump][i] = 1;
-		else if (9930 <= stock[randomseed][i] && stock[randomseed][i]<10000)
+		else if (ran < 996)
 			stock[price][i] -= (rand() % 3000 + 2000), stock[plus_or_minus][i] = 1, stock[pos_collapse][i] = 1;
-		else if (stock[randomseed][i] == 10000)
+		else if (ran < 998)
 			stock[price][i] += (rand() % 5000 + 7000), stock[plus_or_minus][i] = 0;
 		else
 			stock[price][i] -= (rand() % 5000 + 7000), stock[plus_or_minus][i] = 1;
 		//stock[price][i] 랜덤 변경 함수 종료 
+		/******************************************/
+		// 사회적 요인 결정 함수
 
+		/******************************************/
 		if (stock[price][i]<0){ // 파산결정
 			stock[bankrupt][i] = 1;
 			stock[price][i] = 0;
