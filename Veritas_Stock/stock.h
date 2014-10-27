@@ -4,6 +4,7 @@
 #include <time.h>
 #include <windows.h>
 #include <iostream>
+
 using namespace std;
 #pragma warning(disable:4996)
 #define timemax 10
@@ -16,10 +17,24 @@ int stock[10][COMPNUM] = {};
 int student[STUDENT][COMPNUM + 5] = {};
 
 FILE*fp = fopen("data.csv", "w+"); //파일출력
-int i, j, n, temp, ran, social_ran, sum, count;
+int i, j, n, temp, ran, social_ran, sum, count, endgame;
 
 int stockgame();
 int input();
+int buy(int, int, int);
+
+
+enum array {
+		price, // 현재 주가
+		plus_or_minus, // 0이면 증가, 1이면 감소
+		overflow, // 너무 높아서 급락시켜야 함
+		pos_collapse, // 급락 가능성
+		pos_jump, // 급등 가능성
+		bankrupt, // 파산 여부; 1:파산, 0:파산 x
+		bankrupt_turns, // 파산 후 지난 턴 수
+		randomseed, // 랜덤시드
+		randomnum
+};
 
 enum account {
 	장보고해운,
@@ -42,17 +57,6 @@ enum account {
 	현금보유액,
 };
 
-enum array {
-		price, // 현재 주가
-		plus_or_minus, // 0이면 증가, 1이면 감소
-		overflow, // 너무 높아서 급락시켜야 함
-		pos_collapse, // 급락 가능성
-		pos_jump, // 급등 가능성
-		bankrupt, // 파산 여부; 1:파산, 0:파산 x
-		bankrupt_turns, // 파산 후 지난 턴 수
-		randomseed, // 랜덤시드
-		randomnum
-};
 /* run this program using the console pauser or add your own getch, system("pause") or input loop */
 
 
@@ -321,3 +325,46 @@ void init(){
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15); //글자 색 변화 
 
 }
+
+int input(){
+	gotoxy(3, 2 * COMPNUM + 14);
+	int studentnumber, company, number;
+	cout << " \"학번   구입할_주식_이름   구입할_주식_개수\"를 공백으로 구분하여 입력해 주세요" << endl;
+	cin >> studentnumber >> company >> number;
+
+	switch (studentnumber){
+	case 2487:
+		cout << endl << "다음 턴이 곧 시작됩니다";
+		return 0;
+
+	case 4606:
+		cout << endl << "마지막 턴입니다";
+		endgame++;
+		return 0;
+
+	default:
+		gotoxy(3, 2 * COMPNUM + 15);
+		cout << endl << endl;
+		if (student[플레이여부][studentnumber]){
+			int chkerror = buy(studentnumber, company, number);// 주식 구입 기능 구현할 자리
+			if (chkerror) cout << "에러가 발생했습니다.";
+			else cout << "거래가 성공적으로 완료되었습니다.";
+		}
+		else cout << "잘못된 학번 입력입니다.";
+
+		cout << endl << endl;
+		system("PAUSE");
+
+		gotoxy(0, 2 * COMPNUM + 15);
+		cout << "                                                 " << endl;
+		cout << "                                                 " << endl;
+		cout << "                                                 " << endl;
+		cout << "                                                 " << endl;
+		cout << "                                                 " << endl;
+		cout << "                                                 " << endl;
+
+		return 1;
+	}
+}
+
+

@@ -19,35 +19,19 @@ int stockgame(){
 	print_time();
 	clrscr();
 
-	return 1; // 나중에 수정
+	if (endgame) return 0;
+	else return 1;
 }
 
-int input(){
-	gotoxy(3, 2 * COMPNUM + 14);
-	int studentnumber, company, number;
-	cout << " \"학번   구입할_주식_이름   구입할_주식_개수\"를 공백으로 구분하여 입력해 주세요" << endl;
-	cin >> studentnumber >> company >> number;
-
-	if (studentnumber == 2487){
-		cout << endl << "다음 턴이 곧 시작됩니다";
-		return 0;
+int buy(int studentnumber, int company, int number){
+	if (student[현금보유액][studentnumber] < number*stock[price][company]){
+		cout << "보유한 현금이 부족합니다." << endl; return 1;
 	}
-
-	gotoxy(3, 2 * COMPNUM + 15);
-	cout << endl << endl;
-	if (student[플레이여부][studentnumber]){
-
-		// 주식 구입 기능 구현할 자리
-
-		cout  << "정상적으로 처리되었습니다";
+	if (company > COMPNUM) {
+		cout << "회사 이름이 잘못 입력되었습니다." << endl; return 1;
 	}
-	else cout << "잘못된 학번 입력입니다.";
+	student[현금보유액][studentnumber] -= (number*stock[price][company]);
+	student[company][studentnumber] += number;
 
-	cout << endl << endl;
-	system("PAUSE");
-	
-	gotoxy(0, 2 * COMPNUM + 15);
-	cout << "                                                 " << endl << endl << "                                   " << endl << endl << "                                   ";
-
-	return 1;
+	return 0;
 }
