@@ -368,3 +368,15 @@ int input(){
 }
 
 
+int buy(int studentnumber, int company, int number){
+	if (student[현금보유액][studentnumber] < number*stock[price][company]){
+		cout << "보유한 현금이 부족합니다." << endl; return 1;
+	}
+	if (company > COMPNUM) {
+		cout << "회사 이름이 잘못 입력되었습니다." << endl; return 1;
+	}
+	student[현금보유액][studentnumber] -= (number*stock[price][company]);
+	student[company][studentnumber] += number;
+
+	return 0;
+}
