@@ -9,20 +9,21 @@ using namespace std;
 #pragma warning(disable:4996)
 #define timemax 10
 #define COMPNUM 15 // 회사 개수
-#define STUDENT 1600
+#define STUDENT 25
 #define t 2 // 한 턴의 길이
 
 char companyname[COMPNUM][30] = { "장보고해운", "NEVER", "샘숭전자", "와플", "Gogle", "박카스제약", "해이트", "장’s 동원", "김’s 정원", "Sadi&Majo Ent", "GG Ent", "목우촌", "보잉", "911항공", "삼풍건설" }; //회사 이름 설정 
 int stock[10][COMPNUM] = {};
 int student[STUDENT][COMPNUM + 5] = {};
 
-FILE*fp = fopen("data.csv", "w+"); //파일출력
-int i, j, n, temp, ran, social_ran, sum, count, endgame;
+FILE*fout = fopen("data.csv", "wt"); //파일출력
+int i, j, n, temp, ran, social_ran, sum, count, endgame, turn=0;
 
 int stockgame();
 int input();
 int buy(int, int, int);
-
+void printfile();
+void sumprice(int);
 
 enum array {
 		price, // 현재 주가
@@ -52,9 +53,10 @@ enum account {
 	보잉,
 	구일일항공,
 	삼풍건설,
-	이름,
+	학번,
 	플레이여부,
 	현금보유액,
+	총재산
 };
 
 /* run this program using the console pauser or add your own getch, system("pause") or input loop */
@@ -67,12 +69,12 @@ void print_box(){
 	printf("∮VERITAS 모의주식 WITH LIMES∮");
 	srand(time(NULL));
 	gotoxy(3, 6);
-	printf("┌─────────────────────────┬────────────────────┬───────────────────────────────┐");
+	printf("┌─────────────────────────┬────────────────────┐");
 	gotoxy(3, 2 * COMPNUM + 7 - 1);
-	printf("└─────────────────────────┴────────────────────┴──────────────┘");
+	printf("└─────────────────────────┴────────────────────┘");
 	gotoxy(59, 15);
 	printf("           ");
-
+	
 }
 
 
@@ -191,7 +193,7 @@ void stock_price(){
 		if (i == COMPNUM - 1) continue;
 		else {
 			gotoxy(3, 2 * i + 8);
-			printf("├─────────────────────────┼────────────────────┤                            │");
+			printf("├─────────────────────────┼────────────────────┤");
 		}
 	}
 }
@@ -212,119 +214,6 @@ void print_time(){
 /******************************************************************************************************************************************/
 
 
-void news(){
-	/************ 뉴스 조절 부분 ***********/
-	int news_num, type = 12, det;
-	double eq_deg;
-	/***************************************/
-
-
-	gotoxy(45, 8);
-	printf("─────┼──────────────────────────┤");
-	gotoxy(53, 7);
-	printf("         Daily NEWS");
-	news_num = 1;
-	//rand()%type;
-	det = rand() % 3;
-	gotoxy(53, 11);
-	switch (news_num)
-	{
-	case 0: //화산 폭발
-		if (det == 0) printf("백두산 폭발, 용암바다 한반도 전체를 뒤덮어...");
-		else if (det == 1) printf("아이슬란드 화산재 구름 한국꺼지 확산");
-		else printf("엘로우스톤 국립공원, 사상 초유의 폭발 발생");
-		break;
-	case 1: //지진 발생 
-		eq_deg = (double)(rand() % 10) / 10 + 9;
-		if (det == 0) printf("중국 쓰촨성 %.1f 지진 발생, 지진 여파 한국까지...", eq_deg);
-		else if (det == 1) printf("일본 도쿄에서 %.1f 지진 발생, 쓰나미에 한국 동부연안 초토화", eq_deg);
-		else printf("");
-		break;
-	case 2: //전염병 확산 중
-		if (det == 0) printf("백두산 폭발, 용암바다 한반도 전체를 뒤덮어...");
-		else printf("아이슬란드 화산재 구름 한국꺼지 확산");
-		break;
-	case 3: //태풍 발생
-		if (det == 0) printf("백두산 폭발, 용암바다 한반도 전체를 뒤덮어...");
-		else printf("아이슬란드 화산재 구름 한국꺼지 확산");
-		break;
-	case 4: //가뭄 발생
-		if (det == 0) printf("백두산 폭발, 용암바다 한반도 전체를 뒤덮어...");
-		else printf("아이슬란드 화산재 구름 한국꺼지 확산");
-		break;
-	case 5: //테러
-		if (det == 0) printf("백두산 폭발, 용암바다 한반도 전체를 뒤덮어...");
-		else printf("아이슬란드 화산재 구름 한국꺼지 확산");
-		break;
-	case 6: //화재 
-		if (det == 0) printf("백두산 폭발, 용암바다 한반도 전체를 뒤덮어...");
-		else printf("아이슬란드 화산재 구름 한국꺼지 확산");
-		break;
-	case 7: //붕괴 
-		if (det == 0) printf("백두산 폭발, 용암바다 한반도 전체를 뒤덮어...");
-		else printf("아이슬란드 화산재 구름 한국꺼지 확산");
-		break;
-	case 8: //해킹 
-		if (det == 0) printf("백두산 폭발, 용암바다 한반도 전체를 뒤덮어...");
-		else printf("아이슬란드 화산재 구름 한국꺼지 확산");
-		break;
-	case 9: //스캔들 
-		if (det == 0) printf("백두산 폭발, 용암바다 한반도 전체를 뒤덮어...");
-		else printf("아이슬란드 화산재 구름 한국꺼지 확산");
-		break;
-	case 10: //매뚜기 
-		if (det == 0) printf("백두산 폭발, 용암바다 한반도 전체를 뒤덮어...");
-		else printf("아이슬란드 화산재 구름 한국꺼지 확산");
-		break;
-	case 11: //사망 
-		if (det == 0) printf("백두산 폭발, 용암바다 한반도 전체를 뒤덮어...");
-		else printf("아이슬란드 화산재 구름 한국꺼지 확산");
-		break;
-	}
-}
-
-void init(){
-	for (i = 0; i<COMPNUM; i++)	stock[price][i] = 20000; // 주식 초기값 설정
-
-
-	int studentnumber=0;
-
-	while (1) {
-
-		cout << "* VERITAS 모의주식 (with LIMES) ver. 2.0.2 *" << endl << endl;
-		cout << "게임에 참여하시려면 학번을 입력해 주세요 : ";
-		cin >> studentnumber;
-		if (studentnumber>1100 &&
-			(studentnumber <= 1121 ||
-			(studentnumber > 1200 && studentnumber <= 1220) ||
-			(studentnumber > 1300 && studentnumber <= 1320) ||
-			(studentnumber > 1400 && studentnumber <= 1420) ||
-			(studentnumber > 1500 && studentnumber <= 1520)) || studentnumber == 2487){
-			if (studentnumber == 2487) {
-				gotoxy(0, 2);
-				cout << "게임이 곧 시작됩니다.                                        " << endl;  break;
-			}
-				student[플레이여부][studentnumber] = 1;
-		}
-
-
-		
-		if (student[플레이여부][studentnumber]) cout << studentnumber << " 게임 참가 신청 완료." << endl << endl;
-		else if(studentnumber != 2487) cout << "잘못된 학번" << endl << endl;
-		fflush(stdin);
-		system("PAUSE");
-		clrscr();
-	}
-
-	for (i = 0; i < STUDENT; i++) 
-		if(student[플레이여부][i]) student[현금보유액][i] = 200000;
-	system("PAUSE");
-	clrscr();
-	
-
-	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15); //글자 색 변화 
-
-}
 
 int input(){
 	gotoxy(3, 2 * COMPNUM + 14);
@@ -372,7 +261,7 @@ int buy(int studentnumber, int company, int number){
 	if (student[현금보유액][studentnumber] < number*stock[price][company]){
 		cout << "보유한 현금이 부족합니다." << endl; return 1;
 	}
-	if (company > COMPNUM) {
+	if (company > COMPNUM || company<0) {
 		cout << "회사 이름이 잘못 입력되었습니다." << endl; return 1;
 	}
 	student[현금보유액][studentnumber] -= (number*stock[price][company]);

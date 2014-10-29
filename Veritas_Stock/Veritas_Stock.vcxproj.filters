@@ -23,5 +23,8 @@
     <ClInclude Include="stock.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="news.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
