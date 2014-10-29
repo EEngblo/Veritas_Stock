@@ -83,6 +83,7 @@
   <ItemGroup>
     <ClInclude Include="news.h" />
     <ClInclude Include="stock.h" />
+    <ClInclude Include="헤더.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

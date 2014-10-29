@@ -12,9 +12,21 @@ using namespace std;
 #define STUDENT 25
 #define t 2 // 한 턴의 길이
 
+/*********************/
+
+int news_num, type = 11, det;
+double eq_deg;
+char st_name[20][30] = { "강아지", "개미", "우산", "우럭", "태허란", "고수", "숯불", "고니", "바라기", "병마", "은행", "사이펀", "가온", "루템", "글롭", "미래", "굉이", "솔턴", "봉봉", "베닌" };
+char terror[10][30] = { "김정을", "오사마 알라딘", "Burrows", "Big Bros", "ETA", "GyeongGwak", "하마s", "SWAT", "GYLS", "AINS" };
+char bname[20][30] = { "김영득", "이민석", "성재현", "김철수", "이민기", "유진상", "구준혁", "박해준", "김북곽", "제이스" }; //절대 바꾸지 말라고 이민석, 성재현 주장!!! 
+char gname[20][30] = { "주니엘", "수지", "아이유", "혜리", "한지민", "오남희", "정은지", "유라", "박신혜", "김지원" };
+int st_num = 0, ter_num, bnum, gnum, scandle_c;
+int effect[15] = {};
+
+/***************/
 char companyname[COMPNUM][30] = { "장보고해운", "NEVER", "샘숭전자", "와플", "Gogle", "박카스제약", "해이트", "장’s 동원", "김’s 정원", "Sadi&Majo Ent", "GG Ent", "목우촌", "보잉", "911항공", "삼풍건설" }; //회사 이름 설정 
 int stock[10][COMPNUM] = {};
-int student[STUDENT][COMPNUM + 5] = {};
+int student[COMPNUM + 5][STUDENT] = {};
 
 FILE*fout = fopen("data.csv", "wt"); //파일출력
 int i, j, n, temp, ran, social_ran, sum, count, endgame, turn=0;
@@ -24,6 +36,7 @@ int input();
 int buy(int, int, int);
 void printfile();
 void sumprice(int);
+void printaccount();
 
 enum array {
 		price, // 현재 주가
@@ -89,8 +102,6 @@ void stock_price(){
 	if (social_ran < 80) randomconst = 950;
 
 	for (i = 0; i<COMPNUM; i++)	{
-		if (stock[bankrupt][i] == 1) stock[bankrupt_turns][i]++;
-		if (stock[bankrupt_turns][i] >= 5) stock[bankrupt][i] = 0, stock[price][i] = 20000;
 		temp = 0;
 
 		//stock[price][i] 랜덤 변경 함수 시작 
@@ -115,44 +126,51 @@ void stock_price(){
 		if (stock[pos_collapse][i] == 3) ran = 1001, stock[pos_collapse][i] = 0;
 
 		if (ran < 400)
-			temp += rand() % 700 + 200, stock[plus_or_minus][i] = 0;
+			temp += rand() % 700 + 200;
 		else if (ran < 800)
-			temp -= rand() % 700 + 200, stock[plus_or_minus][i] = 1;
+			temp -= rand() % 700 + 200;
 		else if (ran < 875)
-			temp += rand() % 1500 + 300, stock[plus_or_minus][i] = 0;
+			temp += rand() % 1500 + 300;
 		else if (ran < 950)
-			temp -= rand() % 1500 + 300, stock[plus_or_minus][i] = 1;
+			temp -= rand() % 1500 + 300;
 		else if (ran < 965)
-			temp += (rand() % 3000 + 2000), stock[plus_or_minus][i] = 0;
+			temp += (rand() % 3000 + 2000);
 		else if (ran < 980)
-			temp -= (rand() % 3000 + 2000), stock[plus_or_minus][i] = 1;
+			temp -= (rand() % 3000 + 2000);
 		else if (ran < 985)
-			temp += (rand() % 5000 + 5000), stock[plus_or_minus][i] = 0;
+			temp += (rand() % 5000 + 5000);
 		else if (ran < 990)
-			temp -= (rand() % 5000 + 5000), stock[plus_or_minus][i] = 1;
+			temp -= (rand() % 5000 + 5000);
 		else if (ran < 993)
-			temp += (rand() % 3000 + 2000), stock[plus_or_minus][i] = 0, stock[pos_jump][i] = 1;
+			temp += (rand() % 3000 + 2000), stock[pos_jump][i] = 1;
 		else if (ran < 996)
-			temp -= (rand() % 3000 + 2000), stock[plus_or_minus][i] = 1, stock[pos_collapse][i] = 1;
+			temp -= (rand() % 3000 + 2000), stock[pos_collapse][i] = 1;
 		else if (ran < 998)
-			temp += (rand() % 5000 + 7000), stock[plus_or_minus][i] = 0;
+			temp += (rand() % 5000 + 7000);
 		else
-			temp -= (rand() % 5000 + 7000), stock[plus_or_minus][i] = 1;
+			temp -= (rand() % 5000 + 7000);
 
 		
 		//stock[price][i] 랜덤 변경 함수 종료 
 		/******************************************/
 		// 사회적 요인 결정 함수
-
+		temp += effect[i];
 		/******************************************/
+		if (temp>0) stock[plus_or_minus][i] = 0;
+		else if (temp < 0) stock[plus_or_minus][i] = 1;
+		else stock[plus_or_minus][i] = 2;
 
+
+		/*******************************************/
+		if (turn == 1) temp = 0;
 		double tempercent = (double)temp/stock[price][i]*100;
+
 		stock[price][i] += temp;
 		if (stock[price][i]<0){ // 파산결정
 			stock[bankrupt][i] = 1;
 			stock[price][i] = 0;
 		}
-
+		
 		if (temp == 0) stock[plus_or_minus][i] = 2;
 
 		gotoxy(3, 2 * i + 7);
@@ -179,9 +197,6 @@ void stock_price(){
 			gotoxy(27, 2 * i + 7);
 			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);
 			printf("     파산");
-			gotoxy(45, 2 * i + 7);
-			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
-			printf("%d턴 후에 복구", 5 - stock[bankrupt_turns][i]);
 		}
 
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
@@ -193,7 +208,7 @@ void stock_price(){
 		if (i == COMPNUM - 1) continue;
 		else {
 			gotoxy(3, 2 * i + 8);
-			printf("├─────────────────────────┼────────────────────┤");
+			if(!(i==0||i==8))printf("├─────────────────────────┼────────────────────┤");
 		}
 	}
 }
@@ -218,9 +233,11 @@ void print_time(){
 int input(){
 	gotoxy(3, 2 * COMPNUM + 14);
 	int studentnumber, company, number;
-	cout << " \"학번   구입할_주식_이름   구입할_주식_개수\"를 공백으로 구분하여 입력해 주세요" << endl;
-	cin >> studentnumber >> company >> number;
 
+	cout << "학번을 입력해 주세요" << endl;
+	cin >> studentnumber;
+	fflush(stdin);
+	/************************************************/
 	switch (studentnumber){
 	case 2487:
 		cout << endl << "다음 턴이 곧 시작됩니다";
@@ -232,40 +249,80 @@ int input(){
 		return 0;
 
 	default:
+		for (int i = 0; i < STUDENT; i++){
+			if (student[학번][i] == studentnumber){
+				printaccount();
+				goto rightstudentnumber;
+			}
+		}
+		cout << "유효하지 않은 학번 입력입니다" << endl;
+		system("PAUSE");
+		gotoxy(0, 2 * COMPNUM + 15);
+		cout << "                                                                                " << endl;
+		cout << "                                                                                " << endl;
+		cout << "                                                                                " << endl;
+		cout << "                                                                                " << endl;
+		cout << "                                                                                " << endl;
+		cout << "                                                                                " << endl;
+		return 1;
+	}
+	
+	rightstudentnumber:
+	/************************************************/
+	cout << " \"구입할_주식_이름   구입할_주식_개수\"를 공백으로 구분하여 입력해 주세요" << endl;
+	cin >> company >> number;
+	
 		gotoxy(3, 2 * COMPNUM + 15);
 		cout << endl << endl;
-		if (student[플레이여부][studentnumber]){
-			int chkerror = buy(studentnumber, company, number);// 주식 구입 기능 구현할 자리
-			if (chkerror) cout << "에러가 발생했습니다.";
-			else cout << "거래가 성공적으로 완료되었습니다.";
-		}
-		else cout << "잘못된 학번 입력입니다.";
-
+				int chkerror = buy(studentnumber, company, number);// 주식 구입 기능 구현할 자리
+				if (chkerror) cout << "에러가 발생했습니다.";
+				else cout << "거래가 성공적으로 완료되었습니다.";
+			
+		
+			
 		cout << endl << endl;
 		system("PAUSE");
 
 		gotoxy(0, 2 * COMPNUM + 15);
-		cout << "                                                 " << endl;
-		cout << "                                                 " << endl;
-		cout << "                                                 " << endl;
-		cout << "                                                 " << endl;
-		cout << "                                                 " << endl;
-		cout << "                                                 " << endl;
+		cout << "                                                                                " << endl;
+		cout << "                                                                                " << endl;
+		cout << "                                                                                " << endl;
+		cout << "                                                                                " << endl;
+		cout << "                                                                                " << endl;
+		cout << "                                                                                " << endl;
 
 		return 1;
-	}
 }
 
 
 int buy(int studentnumber, int company, int number){
-	if (student[현금보유액][studentnumber] < number*stock[price][company]){
-		cout << "보유한 현금이 부족합니다." << endl; return 1;
-	}
-	if (company > COMPNUM || company<0) {
+
+	if (company > COMPNUM || company < 0) {
 		cout << "회사 이름이 잘못 입력되었습니다." << endl; return 1;
 	}
-	student[현금보유액][studentnumber] -= (number*stock[price][company]);
-	student[company][studentnumber] += number;
 
+	for (int i = 0; i < STUDENT; i++){
+		if (student[학번][i] == studentnumber){
+			if (student[현금보유액][i] < number*stock[price][company]){
+				cout << "보유한 현금이 부족합니다." << endl; return 1;
+		}
+			if (student[company][i] + number < 0){
+				cout << "보유한 주식보다 많은 주식을 팔려고 시도하셨습니다" << endl; return 1;
+			}
+			student[현금보유액][i] -= (number*stock[price][company]);
+			student[company][i] += number;
+
+		}
+
+
+		
+	} 
 	return 0;
+}
+
+void printaccount(){
+
+
+
+	return;
 }

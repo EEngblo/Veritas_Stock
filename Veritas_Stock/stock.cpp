@@ -14,8 +14,9 @@ int stockgame(){
 	
 	turn++;
 	print_box();
-	stock_price();
 	news();
+	stock_price();
+
 	while (input());
 
 	print_time();
@@ -26,6 +27,7 @@ int stockgame(){
 }
 
 void printfile(){
+	/*
 	fprintf(fout, "%d \t", turn);
 	for (int i = 0; i < COMPNUM; i++)
 		fprintf(fout, "%d \t", stock[price][i]);
@@ -39,7 +41,7 @@ void printfile(){
 	}
 	fprintf(fout, "\n\n");
 
-	return;
+	return;  */
 }
 
 void sumprice(int n){
