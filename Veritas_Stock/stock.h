@@ -36,7 +36,7 @@ int input();
 int buy(int, int, int);
 void printfile();
 void sumprice(int);
-void printaccount();
+void printaccount(int);
 
 enum array {
 		price, // 현재 주가
@@ -67,7 +67,6 @@ enum account {
 	구일일항공,
 	삼풍건설,
 	학번,
-	플레이여부,
 	현금보유액,
 	총재산
 };
@@ -231,6 +230,11 @@ void print_time(){
 
 
 int input(){
+	gotoxy(53, 26);
+	cout << "                                                                                                                                                                                                      ";
+	gotoxy(53, 28);
+	cout << "                                                       ";
+
 	gotoxy(3, 2 * COMPNUM + 14);
 	int studentnumber, company, number;
 
@@ -251,7 +255,7 @@ int input(){
 	default:
 		for (int i = 0; i < STUDENT; i++){
 			if (student[학번][i] == studentnumber){
-				printaccount();
+				printaccount(i);
 				goto rightstudentnumber;
 			}
 		}
@@ -268,6 +272,7 @@ int input(){
 	}
 	
 	rightstudentnumber:
+	gotoxy(3, 2 * COMPNUM + 16);
 	/************************************************/
 	cout << " \"구입할_주식_이름   구입할_주식_개수\"를 공백으로 구분하여 입력해 주세요" << endl;
 	cin >> company >> number;
@@ -297,7 +302,7 @@ int input(){
 
 int buy(int studentnumber, int company, int number){
 
-	if (company > COMPNUM || company < 0) {
+	if (company >= COMPNUM || company < 0) {
 		cout << "회사 이름이 잘못 입력되었습니다." << endl; return 1;
 	}
 
@@ -320,7 +325,12 @@ int buy(int studentnumber, int company, int number){
 	return 0;
 }
 
-void printaccount(){
+void printaccount(int studentnumber){
+	gotoxy(53, 26);
+	for (int i = 0; i < COMPNUM; i++){
+		if (student[i][studentnumber] != 0)
+			cout << companyname[i] << " : " << student[i][studentnumber] << "\t";
+	}
 
 
 
